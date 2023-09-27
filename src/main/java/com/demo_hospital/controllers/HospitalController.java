@@ -1,4 +1,4 @@
-package controllers;
+package com.demo_hospital.controllers;
 
 import com.demo_hospital.frontdesk.HospitalFrontDesk;
 import com.demo_hospital.model.Patient;
@@ -19,12 +19,8 @@ import org.springframework.web.bind.annotation.*;
 // This annotation marks the class as a controller that handles incoming HTTP requests.
 @RequestMapping("/api/hospital")
 public class HospitalController {
-    private final HospitalFrontDesk hospitalFrontDesk;
-
     @Autowired
-    public HospitalController(HospitalFrontDesk hospitalFrontDesk) {
-        this.hospitalFrontDesk = hospitalFrontDesk;
-    }
+    private HospitalFrontDesk hospitalFrontDesk;
 
     // Endpoint to register a new patient
     @PostMapping("/patient/register")
@@ -37,7 +33,6 @@ public class HospitalController {
         Patient newPatient = new Patient(
                 patientData.getFirstName(),
                 patientData.getLastName(),
-                patientData.getAge(),
                 patientData.getGender(),
                 patientData.getDateOfBirth(),
                 patientData.getAddress(),
@@ -46,6 +41,7 @@ public class HospitalController {
                 patientData.getTemperature(),
                 patientData.isHasInjury()
         );
+        hospitalFrontDesk.registerPatient(newPatient);
 
         // Return the newly created patient in the response
         return ResponseEntity.ok(newPatient);
@@ -64,10 +60,10 @@ public class HospitalController {
     }
 
     // Endpoint to admit a patient to a room
-    @PostMapping("/admit")
-    public ResponseEntity<String> admitPatientToRoom(@RequestBody AdmissionRequest request) {
-        Long patientId = request.getPatientId();
+    @PostMapping("/patient/admit/{patientId}")
+    public ResponseEntity<String> admitPatientToRoom(@PathVariable Long patientId) {
         String roomName;
+        String roomNameToPrint;
 
         // Check patient condition and assign room accordingly
         Patient patient = hospitalFrontDesk.getPatientById(patientId);
@@ -75,16 +71,18 @@ public class HospitalController {
             return ResponseEntity.badRequest().body("Patient not found.");
         }
         if (patient.isHasInjury() || patient.getTemperature() > 38.00) {
-            roomName = "FirstAidStation";
+            roomName = "firstAidStation";
+            roomNameToPrint = "First Aid Station";
         } else {
-            roomName = "GeneralPractitionerOffice";
+            roomName = "generalPractitionerOffice";
+            roomNameToPrint = "General Practitioner Office";
         }
 
         // Attempt to admit the patient to the room
         boolean admissionSuccess = hospitalFrontDesk.admitPatientToRoom(roomName, patient);
 
         if (admissionSuccess) {
-            return ResponseEntity.ok("Patient admitted to " + roomName); // Respond with success message
+            return ResponseEntity.ok("Patient admitted to " + roomNameToPrint +"."); // Respond with success message
         } else {
             return ResponseEntity.badRequest().body("Admission is impossible now. The room is busy with another patient.");
         }
@@ -111,17 +109,6 @@ public class HospitalController {
     // By adding this annotation Lombok will automatically generate getter and setter methods.
     public static class PatientRegistrationRequest {
         private Patient patient;
-    }
-
-    // Admission request DTO class (for input data)
-    @Data
-    public static class AdmissionRequest {
-        private Long patientId;
-
-        // Constructor that takes a Patient object and extracts the ID
-        public AdmissionRequest(Patient patient) {
-            this.patientId = patient.getPatientId();
-        }
     }
 
     // Release request DTO class (for input data)

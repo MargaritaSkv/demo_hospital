@@ -21,7 +21,6 @@ public class Patient {
     private Long patientId;
     private String firstName;
     private String lastName;
-    private int age;
     private String gender;
     private Date dateOfBirth;
     private String address;
@@ -31,11 +30,10 @@ public class Patient {
     private boolean hasInjury;
 
     // Constructors
-    public Patient(String firstName, String lastName, int age, String gender, Date dateOfBirth,
+    public Patient(String firstName, String lastName, String gender, Date dateOfBirth,
                    String address, String phoneNumber, String symptoms, double temperature, boolean hasInjury) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.age = age;
         this.gender = gender;
         this.dateOfBirth = dateOfBirth;
         this.address = address;
@@ -69,14 +67,6 @@ public class Patient {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
     }
 
     public String getGender() {
