@@ -90,14 +90,13 @@ public class HospitalController {
 
 
     // Endpoint to release a patient from a room
-    @PostMapping("/release")
-    public ResponseEntity<String> releasePatientFromRoom(@RequestBody ReleaseRequest request) {
-        String roomName = request.getRoomName();
+    @PostMapping("/release/{roomName}")
+    public ResponseEntity<String> releasePatientFromRoom(@PathVariable String roomName) {
 
         boolean releaseSuccess = hospitalFrontDesk.releasePatientFromRoom(roomName);
 
         if (releaseSuccess) {
-            return ResponseEntity.ok("Patient released from " + roomName);
+            return ResponseEntity.ok("Patient released from " + roomName +".");
         } else {
             return ResponseEntity.badRequest().body("Room is already empty.");
         }
@@ -109,12 +108,6 @@ public class HospitalController {
     // By adding this annotation Lombok will automatically generate getter and setter methods.
     public static class PatientRegistrationRequest {
         private Patient patient;
-    }
-
-    // Release request DTO class (for input data)
-    @Data
-    public static class ReleaseRequest {
-        private String roomName;
     }
 
 }

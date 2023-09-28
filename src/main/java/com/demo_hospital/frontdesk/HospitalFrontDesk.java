@@ -5,6 +5,7 @@ import com.demo_hospital.repository.PatientRepository;
 import com.demo_hospital.rooms.Room;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.Map;
 
 /**
@@ -44,8 +45,9 @@ public class HospitalFrontDesk {
     public boolean admitPatientToRoom(String roomName, Patient patient) {
         Room room = rooms.get(roomName);
         if (room != null) {
-            room.admitPatient(patient);
-            return true; // Indicate that the admission was successful
+            if (room.admitPatient(patient)) {
+                return true; // Indicate that the admission was successful
+            } else return false;
         }
         return false;
     }
@@ -53,8 +55,9 @@ public class HospitalFrontDesk {
     public boolean releasePatientFromRoom(String roomName) {
         Room room = rooms.get(roomName);
         if (room != null) {
-            room.releasePatient();
-            return true; // Indicate that the release was successful
+            if (room.releasePatient() != null) {
+                return true; // Indicate that the release was successful
+            } else return false;
         }
         return false;
     }
